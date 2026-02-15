@@ -1,0 +1,31 @@
+{
+  "name": "mock-test-generator",
+  "version": "1.0.0",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "seed": "ts-node src/seed/workflow.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/mongoose": "^10.0.0",
+    "mongoose": "^7.0.0",
+    "joi": "^17.10.0",
+    "nestjs-pino": "^4.0.0",
+    "@nestjs/config": "^3.0.0",
+    "@nestjs/swagger": "^7.0.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6",
+    "@types/node": "^20.4.2",
+    "@nestjs/cli": "^10.2.5"
+  },
+  "overrides": {
+    "glob": "^10.3.0"
+  }
+}

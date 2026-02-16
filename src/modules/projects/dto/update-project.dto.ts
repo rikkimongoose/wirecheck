@@ -1,10 +1,19 @@
-import Joi from 'joi';
+import { Env } from '../../common/schemas/env.schema';
+import * as Joi from 'joi';
 
-// Схема для валидации обновления проекта
+export class UpdateProjectDto {
+  name?: string;
+  description?: string;
+  envs?: Record<string, Env>;
+}
+
 export const UpdateProjectSchema = Joi.object({
-  name: Joi.string().optional(),
-  description: Joi.string().optional(),
+  name: Joi.string().optional().min(1).max(100),
+  description: Joi.string().optional().allow('').max(500),
   envs: Joi.object()
-    .pattern(Joi.string(), Joi.string())
+    .pattern(Joi.string(), Joi.object({
+      url: Joi.string().required(),
+      variables: Joi.object().pattern(Joi.string(), Joi.string()).optional()
+    }))
     .optional(),
 });

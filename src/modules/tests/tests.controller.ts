@@ -1,46 +1,70 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { TestsService } from './tests.service';
-import { CreateTestSchema } from './dto/create-test.dto';
-import { MoveTestSchema } from './dto/move-test.dto';
-import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
+import { CreateTestDto, CreateTestSchema } from './dto/create-test.dto';
+import { UpdateTestDto, UpdateTestSchema } from './dto/update-test.dto';
+import { MoveTestDto, MoveTestSchema } from './dto/move-test.dto';
+import { JoiValidationPipe } from '../common/pipes/joi-validation.pipe';
+import { Test as TestModel } from './schemas/test.schema';
 
-@Controller('api/tests')
+@Controller('tests')
 export class TestsController {
-  constructor(private readonly service: TestsService) {}
+  constructor(private readonly testsService: TestsService) {}
 
-  @Post('project/:projectId')
-  async createRoot(@Param('projectId') projectId: string, @Body(new JoiValidationPipe(CreateTestSchema)) dto: any) {
-    return this.service.create(projectId, null, dto);
+  // Создание теста
+  @Post()
+  @UsePipes(new JoiValidationPipe(CreateTestSchema))
+  async create(@Body() createTestDto: CreateTestDto): Promise<TestModel> {
+    return this.testsService.create(createTestDto, createTestDto.parentId);
   }
 
-  @Post(':parentId/children')
-  async createChild(@Param('parentId') parentId: string, @Body(new JoiValidationPipe(CreateTestSchema)) dto: any) {
-    const parent = await this.service.findOne(parentId);
-    return this.service.create(parent.projectId, parentId, dto);
-  }
-
+  // Получение одного теста по id
   @Get(':id')
-  async get(@Param('id') id: string) {
-    return this.service.findOne(id);
+  async findOne(@Param('id') id: string): Promise<TestModel> {
+    return this.testsService.findOne(id);
   }
 
+  // Обновление теста
   @Patch(':id')
-  async update(@Param('id') id: string, @Body(new JoiValidationPipe(CreateTestSchema)) dto: any) {
-    return this.service.update(id, dto);
+  @UsePipes(new JoiValidationPipe(UpdateTestSchema))
+  async update(
+    @Param('id') id: string,
+    @Body() updateTestDto: UpdateTestDto,
+  ): Promise<TestModel> {
+    return this.testsService.update(id, updateTestDto);
   }
 
+  // Удаление теста
   @Delete(':id')
-  async delete(@Param('id') id: string) {
-    return this.service.remove(id);
+  async remove(@Param('id') id: string): Promise<{ success: boolean }> {
+    await this.testsService.remove(id);
+    return { success: true };
   }
 
-  @Post(':id/move')
-  async move(@Param('id') id: string, @Body(new JoiValidationPipe(MoveTestSchema)) body: any) {
-    return this.service.move(id, body.newParentId);
+  // Перемещение теста
+  @Patch(':id/move')
+  @UsePipes(new JoiValidationPipe(MoveTestSchema))
+  async move(
+    @Param('id') id: string,
+    @Body() moveTestDto: MoveTestDto,
+  ): Promise<TestModel> {
+    // На всякий случай устанавливаем id из параметра
+    moveTestDto.testId = id;
+    return this.testsService.move(moveTestDto);
   }
 
-  @Get(':id/subtree')
-  async getSubtree(@Param('id') id: string) {
-    return this.service.getSubtree(id);
+  // Получение полного дерева тестов по проекту
+  @Get('/project/:projectId/tree')
+  async getProjectTree(@Param('projectId') projectId: string): Promise<TestModel[]> {
+    return this.testsService.getProjectTree(projectId);
   }
 }

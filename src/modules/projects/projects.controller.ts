@@ -1,7 +1,8 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
-import { CreateProjectSchema, UpdateProjectSchema } from './dto/create-project.dto';
-import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
+import { CreateProjectSchema } from './dto/create-project.dto';
+import { UpdateProjectSchema } from './dto/update-project.dto';
+import { JoiValidationPipe } from '../common/pipes/joi-validation.pipe';
 
 @Controller('api/projects')
 export class ProjectsController {

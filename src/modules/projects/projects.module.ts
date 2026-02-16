@@ -8,7 +8,7 @@ import { TestsModule } from '../tests/tests.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
-    TestsModule, // для возможных связей (optional)
+    TestsModule, // <- теперь Nest видит TestModel через экспорт
   ],
   providers: [ProjectsService],
   controllers: [ProjectsController],

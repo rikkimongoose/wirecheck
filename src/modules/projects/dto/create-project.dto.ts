@@ -1,14 +1,21 @@
-import Joi from 'joi';
-import { EnvSchema } from '../../common/schemas/env.schema';
+import { Env } from '../../common/schemas/env.schema';
+import * as Joi from 'joi';
 
+// TypeScript-класс для Type Checking
+export class CreateProjectDto {
+  name: string;
+  description?: string;
+  envs?: Record<string, Env>;
+}
+
+// Joi-схема для runtime-валидации
 export const CreateProjectSchema = Joi.object({
-  name: Joi.string().min(1).required(),
-  description: Joi.string().allow('').optional(),
-  envs: Joi.object().pattern(Joi.string(), EnvSchema).required(),
-});
-
-export const UpdateProjectSchema = Joi.object({
-  name: Joi.string().min(1).optional(),
-  description: Joi.string().allow('').optional(),
-  envs: Joi.object().pattern(Joi.string(), EnvSchema).optional(),
+  name: Joi.string().required().min(1).max(100),
+  description: Joi.string().optional().allow('').max(500),
+  envs: Joi.object()
+    .pattern(Joi.string(), Joi.object({
+      url: Joi.string().required(),
+      variables: Joi.object().pattern(Joi.string(), Joi.string()).optional()
+    }))
+    .optional(),
 });

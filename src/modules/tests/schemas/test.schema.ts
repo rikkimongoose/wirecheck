@@ -1,20 +1,37 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { Auth } from '../../modules/projects/schemas/project.schema';
+import { Document, Types, Schema as MongooseSchema } from 'mongoose';
 
-export type TestDocument = TestEntity & Document;
+// Тип Auth
+export type AuthType = 'http' | 'bearer' | 'jwt';
+
+export class Auth {
+  @Prop({ type: String })
+  type?: AuthType;
+
+  @Prop({ type: String })
+  user?: string;
+
+  @Prop({ type: String })
+  password?: string;
+
+  @Prop({ type: Map, of: String })
+  headers?: Record<string, string>;
+}
+
+// Результат теста
+export class TestResult {
+  @Prop()
+  code?: number;
+
+  @Prop({ type: Map, of: String })
+  headers?: Record<string, string>;
+
+  @Prop({ type: MongooseSchema.Types.Mixed })
+  body?: any;
+}
 
 @Schema({ timestamps: true })
-export class TestEntity {
-  @Prop({ required: true, index: true })
-  projectId: string;
-
-  @Prop({ index: true })
-  parentId?: string;
-
-  @Prop({ required: true, index: true })
-  path: string; // materialized path
-
+export class Test extends Document {
   @Prop()
   name?: string;
 
@@ -22,40 +39,37 @@ export class TestEntity {
   description?: string;
 
   @Prop()
-  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  path: string;
 
-  @Prop()
-  urlPath?: string;
+  @Prop({ default: 'GET' })
+  method: string;
 
-  @Prop({ type: Object })
+  @Prop({ type: Map, of: String })
   params?: Record<string, string>;
 
-  @Prop({ type: Object })
+  @Prop({ type: Map, of: String })
   headers?: Record<string, string>;
 
-  @Prop()
+  @Prop({ default: 5000 })
   timeout?: number;
 
-  @Prop({ type: Object })
+  @Prop({ type: Auth, default: {} })
+  auth?: Auth;
+
+  @Prop({ type: MongooseSchema.Types.Mixed })
   body?: any;
 
   @Prop()
   bodyType?: 'json' | 'form-data' | 'x-www-form-urlencoded' | 'text' | 'xml';
 
-  @Prop({ type: Object })
-  result?: {
-    code: number;
-    headers?: Record<string, string>;
-    body?: any;
-  };
+  @Prop({ type: TestResult, default: {} })
+  result?: TestResult;
 
-  @Prop({ type: Object })
-  auth?: Auth;
-
-  @Prop({ type: Date })
-  deletedAt?: Date;
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Test' }] })
+  tests?: Test[]; // дочерние тесты
+  
+  @Prop({ type: Types.ObjectId, ref: 'Project', required: true })
+  project: Types.ObjectId; // <-- добавили поле project
 }
 
-export const TestSchema = SchemaFactory.createForClass(TestEntity);
-TestSchema.index({ projectId: 1, path: 1 });
-TestSchema.index({ path: 1 });
+export const TestSchema = SchemaFactory.createForClass(Test);

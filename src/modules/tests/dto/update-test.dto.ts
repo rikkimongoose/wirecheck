@@ -8,9 +8,10 @@ export class UpdateTestDto {
   name?: string;
   description?: string;
   path?: string;
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
   params?: Record<string, string>;
   headers?: Record<string, string>;
+  cookies?: Record<string, string>;
   timeout?: number;
   auth?: Auth;
   body?: any;
@@ -18,6 +19,7 @@ export class UpdateTestDto {
   result?: {
     code?: number;
     headers?: Record<string, string>;
+    cookies?: Record<string, string>;
     body?: any;
   };
   tests?: UpdateTestDto[];
@@ -31,9 +33,10 @@ export const UpdateTestSchema = Joi.object({
   name: Joi.string().optional().max(100),
   description: Joi.string().optional().allow('').max(500),
   path: Joi.string().optional(),
-  method: Joi.string().valid('GET','POST','PUT','DELETE','PATCH').optional(),
+  method: Joi.string().valid('GET','POST','PUT','DELETE','PATCH','HEAD','OPTIONS').optional(),
   params: Joi.object().pattern(Joi.string(), Joi.string()).optional(),
   headers: Joi.object().pattern(Joi.string(), Joi.string()).optional(),
+  cookies: Joi.object().pattern(Joi.string(), Joi.string()).optional(),
   timeout: Joi.number().optional(),
   auth: Joi.object({
     type: Joi.string().valid('http','bearer','jwt').optional(),
@@ -46,6 +49,7 @@ export const UpdateTestSchema = Joi.object({
   result: Joi.object({
     code: Joi.number().optional(),
     headers: Joi.object().pattern(Joi.string(), Joi.string()).optional(),
+    cookies: Joi.object().pattern(Joi.string(), Joi.string()).optional(),
     body: Joi.any().optional()
   }).optional(),
   tests: Joi.array().items(Joi.link('#UpdateTestSchema')).optional(),

@@ -26,6 +26,9 @@ export class TestResult {
   @Prop({ type: Map, of: String })
   headers?: Record<string, string>;
 
+  @Prop({ type: Map, of: String })
+  cookies?: Record<string, string>;
+
   @Prop({ type: MongooseSchema.Types.Mixed })
   body?: any;
 }
@@ -49,6 +52,9 @@ export class Test extends Document {
 
   @Prop({ type: Map, of: String })
   headers?: Record<string, string>;
+
+  @Prop({ type: Map, of: String })
+  cookies?: Record<string, string>;
 
   @Prop({ default: 5000 })
   timeout?: number;

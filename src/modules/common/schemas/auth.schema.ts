@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
 
 export type AuthType = 'http' | 'bearer' | 'jwt';
 
@@ -15,7 +14,7 @@ export class HeaderEntry {
 }
 
 @Schema()
-export class Auth extends Document {
+export class Auth {
   @Prop({ type: String })
   type?: AuthType;
 
@@ -29,4 +28,5 @@ export class Auth extends Document {
   headers?: HeaderEntry[];
 }
 
+export const HeaderEntrySchema = SchemaFactory.createForClass(HeaderEntry);
 export const AuthSchema = SchemaFactory.createForClass(Auth);

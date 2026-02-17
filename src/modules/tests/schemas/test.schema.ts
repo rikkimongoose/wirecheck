@@ -1,19 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types, Schema as MongooseSchema } from 'mongoose';
-
-// Тип Auth
-export type AuthType = 'http' | 'bearer' | 'jwt';
-
-export class HeaderEntry {
-  @Prop({ type: String, required: true })
-  name: string;
-
-  @Prop({ type: String, required: true })
-  value: string;
-
-  @Prop({ type: String })
-  description?: string;
-}
+import {
+  Auth,
+  AuthSchema,
+  HeaderEntry,
+  HeaderEntrySchema,
+} from '../../common/schemas/auth.schema';
 
 export enum RequestBodyType {
   JSON = 'json',
@@ -70,29 +62,15 @@ export type RequestBody =
   | RawRequestBody
   | BinaryRequestBody;
 
-export class Auth {
-  @Prop({ type: String })
-  type?: AuthType;
-
-  @Prop({ type: String })
-  user?: string;
-
-  @Prop({ type: String })
-  password?: string;
-
-  @Prop({ type: [HeaderEntry], default: [] })
-  headers?: HeaderEntry[];
-}
-
 // Результат теста
 export class TestResult {
   @Prop()
   code?: number;
 
-  @Prop({ type: [HeaderEntry], default: [] })
+  @Prop({ type: [HeaderEntrySchema], default: [] })
   headers?: HeaderEntry[];
 
-  @Prop({ type: [HeaderEntry], default: [] })
+  @Prop({ type: [HeaderEntrySchema], default: [] })
   cookies?: HeaderEntry[];
 
   @Prop({ type: MongooseSchema.Types.Mixed })
@@ -116,16 +94,16 @@ export class Test extends Document {
   @Prop({ type: Map, of: String })
   params?: Record<string, string>;
 
-  @Prop({ type: [HeaderEntry], default: [] })
+  @Prop({ type: [HeaderEntrySchema], default: [] })
   headers?: HeaderEntry[];
 
-  @Prop({ type: [HeaderEntry], default: [] })
+  @Prop({ type: [HeaderEntrySchema], default: [] })
   cookies?: HeaderEntry[];
 
   @Prop({ default: 5000 })
   timeout?: number;
 
-  @Prop({ type: Auth, default: {} })
+  @Prop({ type: AuthSchema, default: {} })
   auth?: Auth;
 
   @Prop({ type: MongooseSchema.Types.Mixed })

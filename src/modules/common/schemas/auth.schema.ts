@@ -3,6 +3,17 @@ import { Document } from 'mongoose';
 
 export type AuthType = 'http' | 'bearer' | 'jwt';
 
+export class HeaderEntry {
+  @Prop({ type: String, required: true })
+  name: string;
+
+  @Prop({ type: String, required: true })
+  value: string;
+
+  @Prop({ type: String })
+  description?: string;
+}
+
 @Schema()
 export class Auth extends Document {
   @Prop({ type: String })
@@ -14,8 +25,8 @@ export class Auth extends Document {
   @Prop({ type: String })
   password?: string;
 
-  @Prop({ type: Map, of: String })
-  headers?: Record<string, string>;
+  @Prop({ type: [HeaderEntry], default: [] })
+  headers?: HeaderEntry[];
 }
 
 export const AuthSchema = SchemaFactory.createForClass(Auth);
